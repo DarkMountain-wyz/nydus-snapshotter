@@ -157,9 +157,9 @@ func (m *Manager) BuildDaemonCommand(d *daemon.Daemon, bin string, upgrade bool)
 				command.WithBootstrap(bootstrap),
 			)
 			if config.IsCredentialSourceEnabled() {
-				configApiPath := fmt.Sprintf(endpointGetCredential, d.States.ID)
+				configAPIPath := fmt.Sprintf(endpointGetCredential, d.States.ID)
 				cmdOpts = append(cmdOpts,
-					command.WithCredentialSource(config.SystemControllerAddress() + configApiPath),
+					command.WithCredentialSource(config.SystemControllerAddress()+configApiPath),
 				)
 			}
 		default:
