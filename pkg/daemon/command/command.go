@@ -26,16 +26,17 @@ type DaemonCommand struct {
 	Upgrade        bool   `type:"flag" name:"upgrade" default:""`
 	ThreadNum      string `type:"param" name:"thread-num"`
 	// `--id` is required by `--supervisor` when starting nydusd
-	ID              string `type:"param" name:"id"`
-	Config          string `type:"param" name:"config"`
-	Bootstrap       string `type:"param" name:"bootstrap"`
-	Mountpoint      string `type:"param" name:"mountpoint"`
-	APISock         string `type:"param" name:"apisock"`
-	LogLevel        string `type:"param" name:"log-level"`
-	LogRotationSize int    `type:"param" name:"log-rotation-size"`
-	Supervisor      string `type:"param" name:"supervisor"`
-	LogFile         string `type:"param" name:"log-file"`
-	PrefetchFiles   string `type:"param" name:"prefetch-files"`
+	ID               string `type:"param" name:"id"`
+	Config           string `type:"param" name:"config"`
+	Bootstrap        string `type:"param" name:"bootstrap"`
+	Mountpoint       string `type:"param" name:"mountpoint"`
+	APISock          string `type:"param" name:"apisock"`
+	LogLevel         string `type:"param" name:"log-level"`
+	LogRotationSize  int    `type:"param" name:"log-rotation-size"`
+	Supervisor       string `type:"param" name:"supervisor"`
+	LogFile          string `type:"param" name:"log-file"`
+	PrefetchFiles    string `type:"param" name:"prefetch-files"`
+	CredentialSource string `type:"param" name:"credential-source"`
 }
 
 // Build exec style command line
@@ -187,5 +188,11 @@ func WithID(id string) Opt {
 func WithUpgrade() Opt {
 	return func(cmd *DaemonCommand) {
 		cmd.Upgrade = true
+	}
+}
+
+func WithCredentialSource(source string) Opt {
+	return func(cmd *DaemonCommand) {
+		cmd.CredentialSource = source
 	}
 }

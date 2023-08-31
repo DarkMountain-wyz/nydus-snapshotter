@@ -13,6 +13,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/containerd/nydus-snapshotter/config"
 	"github.com/containerd/nydus-snapshotter/pkg/auth"
 )
 
@@ -94,9 +95,36 @@ func (c *FuseDaemonConfig) DumpString() (string, error) {
 	return DumpConfigString(c)
 }
 
+// We can set the Backend tag to "-" so that Backend Config does not write to local files.
+// But it needs to be compatible with the old version,
+// and it is not possible to control whether Backend Config is written to the local file through tag.
+// Therefore, a deep copy of the Config information is made here,
+// and the Backend Config is set to null.
 func (c *FuseDaemonConfig) DumpFile(f string) error {
 	if err := os.MkdirAll(path.Dir(f), 0755); err != nil {
 		return err
+	}
+	if config.IsCredentialSourceEnabled() {
+		switch c.Device.Backend.BackendType {
+		case BackendTypeRegistry:
+			backendAuth := c.Device.Backend.Config.Auth
+			registryToken := c.Device.Backend.Config.RegistryToken
+			c.Device.Backend.Config.Auth = ""
+			c.Device.Backend.Config.RegistryToken = ""
+			err := DumpConfigFile(c, f)
+			c.Device.Backend.Config.Auth = backendAuth
+			c.Device.Backend.Config.RegistryToken = registryToken
+			return err
+		case BackendTypeOss:
+			accessKeyID := c.Device.Backend.Config.AccessKeyID
+			accessKeySecret := c.Device.Backend.Config.AccessKeySecret
+			c.Device.Backend.Config.AccessKeyID = ""
+			c.Device.Backend.Config.AccessKeySecret = ""
+			err := DumpConfigFile(c, f)
+			c.Device.Backend.Config.Auth = accessKeyID
+			c.Device.Backend.Config.RegistryToken = accessKeySecret
+			return err
+		}
 	}
 	return DumpConfigFile(c, f)
 }

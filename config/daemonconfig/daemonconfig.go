@@ -21,9 +21,9 @@ import (
 type StorageBackendType = string
 
 const (
-	backendTypeLocalfs  StorageBackendType = "localfs"
-	backendTypeOss      StorageBackendType = "oss"
-	backendTypeRegistry StorageBackendType = "registry"
+	BackendTypeLocalfs  StorageBackendType = "localfs"
+	BackendTypeOss      StorageBackendType = "oss"
+	BackendTypeRegistry StorageBackendType = "registry"
 )
 
 type DaemonConfig interface {
@@ -149,7 +149,7 @@ func SupplementDaemonConfig(c DaemonConfig, imageID, snapshotID string,
 	backendType, _ := c.StorageBackend()
 
 	switch backendType {
-	case backendTypeRegistry:
+	case BackendTypeRegistry:
 		registryHost := image.Host
 		if vpcRegistry {
 			registryHost = registry.ConvertToVPCHost(registryHost)
@@ -171,8 +171,8 @@ func SupplementDaemonConfig(c DaemonConfig, imageID, snapshotID string,
 
 	// Localfs and OSS backends don't need any update,
 	// just use the provided config in template
-	case backendTypeLocalfs:
-	case backendTypeOss:
+	case BackendTypeLocalfs:
+	case BackendTypeOss:
 	default:
 		return errors.Errorf("unknown backend type %s", backendType)
 	}

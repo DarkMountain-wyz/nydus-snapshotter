@@ -23,7 +23,7 @@ import (
 	"github.com/containerd/containerd/log"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-
+	"github.com/containerd/nydus-snapshotter/config/daemonconfig"
 	"github.com/containerd/nydus-snapshotter/pkg/daemon"
 	"github.com/containerd/nydus-snapshotter/pkg/daemon/types"
 	"github.com/containerd/nydus-snapshotter/pkg/errdefs"
@@ -42,6 +42,8 @@ const (
 	endpointDaemonRecords  string = "/api/v1/daemons/records"
 	endpointDaemonsUpgrade string = "/api/v1/daemons/upgrade"
 	endpointPrefetch       string = "/api/v1/prefetch"
+	// Provide credential information
+	endpointGetCredential string = "/api/v1/daemons/{id}/credential"
 )
 
 const defaultErrorCode string = "Unknown"
@@ -171,6 +173,63 @@ func (sc *Controller) registerRouter() {
 	sc.router.HandleFunc(endpointDaemonsUpgrade, sc.upgradeDaemons()).Methods(http.MethodPut)
 	sc.router.HandleFunc(endpointDaemonRecords, sc.getDaemonRecords()).Methods(http.MethodGet)
 	sc.router.HandleFunc(endpointPrefetch, sc.setPrefetchConfiguration()).Methods(http.MethodPut)
+	sc.router.HandleFunc(endpointGetCredential, sc.getCredential()).Methods(http.MethodGet)
+}
+
+func (sc *Controller) getCredential() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		var statusCode int
+
+		defer func() {
+			if err != nil {
+				m := newErrorMessage(err.Error())
+				http.Error(w, m.encode(), statusCode)
+			}
+		}()
+
+		vars := mux.Vars(r)
+		id := vars["id"]
+
+		for _, ma := range sc.managers {
+			ma.Lock()
+			d := ma.GetByDaemonID(id)
+
+			if d != nil {
+				backendType, backendConfig := d.Config.StorageBackend()
+				var credentialConfig interface{}
+				switch backendType {
+				case daemonconfig.BackendTypeRegistry:
+					credentialConfig = struct {
+						Auth          string `json:"auth,omitempty"`
+						RegistryToken string `json:"registry_token,omitempty"`
+					}{
+						backendConfig.Auth,
+						backendConfig.RegistryToken,
+					}
+				case daemonconfig.BackendTypeOss:
+					credentialConfig = struct {
+						AccessKeyID     string `json:"access_key_id,omitempty"`
+						AccessKeySecret string `json:"access_key_secret,omitempty"`
+					}{
+						backendConfig.AccessKeyID,
+						backendConfig.AccessKeySecret,
+					}
+				default:
+					err = errdefs.ErrNotFound
+					statusCode = http.StatusNotFound
+					return
+				}
+				jsonResponse(w, credentialConfig)
+				ma.Unlock()
+				return
+			}
+			ma.Unlock()
+		}
+
+		err = errdefs.ErrNotFound
+		statusCode = http.StatusNotFound
+	}
 }
 
 func (sc *Controller) setPrefetchConfiguration() func(w http.ResponseWriter, r *http.Request) {
