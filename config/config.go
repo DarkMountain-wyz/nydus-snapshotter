@@ -107,10 +107,10 @@ const (
 )
 
 type Experimental struct {
-	EnableStargz           bool        `toml:"enable_stargz"`
-	EnableReferrerDetect   bool        `toml:"enable_referrer_detect"`
-	TarfsConfig            TarfsConfig `toml:"tarfs"`
-	EnableCredentialSource bool        `toml:"enable_credential_source"`
+	EnableStargz         	bool        `toml:"enable_stargz"`
+	EnableReferrerDetect 	bool        `toml:"enable_referrer_detect"`
+	TarfsConfig          	TarfsConfig `toml:"tarfs"`
+	EnableCredentialSource	bool		`toml:"enable_credential_source"`
 }
 
 type TarfsConfig struct {
