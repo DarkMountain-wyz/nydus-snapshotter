@@ -21,8 +21,6 @@ import (
 	"time"
 
 	"github.com/containerd/containerd/log"
-	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/containerd/nydus-snapshotter/config/daemonconfig"
 	"github.com/containerd/nydus-snapshotter/pkg/daemon"
 	"github.com/containerd/nydus-snapshotter/pkg/daemon/types"
@@ -31,6 +29,8 @@ import (
 	"github.com/containerd/nydus-snapshotter/pkg/manager"
 	metrics "github.com/containerd/nydus-snapshotter/pkg/metrics/tool"
 	"github.com/containerd/nydus-snapshotter/pkg/prefetch"
+	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 )
 
 const (
