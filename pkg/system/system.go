@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/containerd/containerd/log"
-	"github.com/containerd/nydus-snapshotter/config/daemonconfig"
 	"github.com/containerd/nydus-snapshotter/pkg/daemon"
 	"github.com/containerd/nydus-snapshotter/pkg/daemon/types"
 	"github.com/containerd/nydus-snapshotter/pkg/errdefs"
@@ -197,30 +196,14 @@ func (sc *Controller) getCredential() func(w http.ResponseWriter, r *http.Reques
 
 			if d != nil {
 				backendType, backendConfig := d.Config.StorageBackend()
-				var credentialConfig interface{}
-				switch backendType {
-				case daemonconfig.BackendTypeRegistry:
-					credentialConfig = struct {
-						Auth          string `json:"auth,omitempty"`
-						RegistryToken string `json:"registry_token,omitempty"`
-					}{
-						backendConfig.Auth,
-						backendConfig.RegistryToken,
-					}
-				case daemonconfig.BackendTypeOss:
-					credentialConfig = struct {
-						AccessKeyID     string `json:"access_key_id,omitempty"`
-						AccessKeySecret string `json:"access_key_secret,omitempty"`
-					}{
-						backendConfig.AccessKeyID,
-						backendConfig.AccessKeySecret,
-					}
-				default:
-					err = errdefs.ErrNotFound
-					statusCode = http.StatusNotFound
-					return
+				backend := struct {
+					BackendType string      `json:"type"`
+					Config      interface{} `json:"config"`
+				}{
+					backendType,
+					backendConfig,
 				}
-				jsonResponse(w, credentialConfig)
+				jsonResponse(w, backend)
 				ma.Unlock()
 				return
 			}
