@@ -126,7 +126,7 @@ type DeviceConfig struct {
 // We don't have to persist configuration file for fscache since its configuration
 // is passed through HTTP API.
 func DumpConfigFile(c interface{}, path string) error {
-	if config.IsCredentialSourceEnabled() {
+	if config.IsBackendSourceEnabled() {
 		c = serializeWithSecretFilter(c)
 	}
 	b, err := json.Marshal(c)

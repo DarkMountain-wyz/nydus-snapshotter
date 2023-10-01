@@ -105,8 +105,8 @@ enable_stargz = false
 # Also see https://github.com/opencontainers/distribution-spec/blob/main/spec.md#listing-referrers
 enable_referrer_detect = false
 # Whether to enable authentication support
-# The option enables nydus snapshot to provide credential information to nydusd instead of writing to a file.
-enable_credential_source = false
+# The option enables nydus snapshot to provide backend information to nydusd.
+enable_backend_source = false
 [experimental.tarfs]
 # Whether to enable nydus tarfs mode. Tarfs is supported by:
 # - The EROFS filesystem driver since Linux 6.4

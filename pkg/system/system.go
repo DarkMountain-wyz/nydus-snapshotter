@@ -41,8 +41,8 @@ const (
 	endpointDaemonRecords  string = "/api/v1/daemons/records"
 	endpointDaemonsUpgrade string = "/api/v1/daemons/upgrade"
 	endpointPrefetch       string = "/api/v1/prefetch"
-	// Provide credential information
-	endpointGetCredential string = "/api/v1/daemons/{id}/credential"
+	// Provide backend information
+	endpointGetBackend string = "/api/v1/daemons/{id}/backend"
 )
 
 const defaultErrorCode string = "Unknown"
@@ -172,10 +172,10 @@ func (sc *Controller) registerRouter() {
 	sc.router.HandleFunc(endpointDaemonsUpgrade, sc.upgradeDaemons()).Methods(http.MethodPut)
 	sc.router.HandleFunc(endpointDaemonRecords, sc.getDaemonRecords()).Methods(http.MethodGet)
 	sc.router.HandleFunc(endpointPrefetch, sc.setPrefetchConfiguration()).Methods(http.MethodPut)
-	sc.router.HandleFunc(endpointGetCredential, sc.getCredential()).Methods(http.MethodGet)
+	sc.router.HandleFunc(endpointGetBackend, sc.getBackend()).Methods(http.MethodGet)
 }
 
-func (sc *Controller) getCredential() func(w http.ResponseWriter, r *http.Request) {
+func (sc *Controller) getBackend() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error
 		var statusCode int

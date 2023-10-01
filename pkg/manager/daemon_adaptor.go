@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nydus-snapshotter/pkg/prefetch"
 )
 
-const endpointGetCredential string = "/api/v1/daemons/%s/credential"
+const endpointGetBackend string = "/api/v1/daemons/%s/backend"
 
 // Fork the nydusd daemon with the process PID decided
 func (m *Manager) StartDaemon(d *daemon.Daemon) error {
@@ -156,10 +156,10 @@ func (m *Manager) BuildDaemonCommand(d *daemon.Daemon, bin string, upgrade bool)
 				command.WithConfig(d.ConfigFile("")),
 				command.WithBootstrap(bootstrap),
 			)
-			if config.IsCredentialSourceEnabled() {
-				configAPIPath := fmt.Sprintf(endpointGetCredential, d.States.ID)
+			if config.IsBackendSourceEnabled() {
+				configAPIPath := fmt.Sprintf(endpointGetBackend, d.States.ID)
 				cmdOpts = append(cmdOpts,
-					command.WithCredentialSource(config.SystemControllerAddress()+configAPIPath),
+					command.WithBackendSource(config.SystemControllerAddress()+configAPIPath),
 				)
 			}
 		default:

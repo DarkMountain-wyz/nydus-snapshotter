@@ -36,7 +36,7 @@ type DaemonCommand struct {
 	Supervisor       string `type:"param" name:"supervisor"`
 	LogFile          string `type:"param" name:"log-file"`
 	PrefetchFiles    string `type:"param" name:"prefetch-files"`
-	CredentialSource string `type:"param" name:"credential-source"`
+	BackendSource string `type:"param" name:"backend-source"`
 }
 
 // Build exec style command line
@@ -191,8 +191,8 @@ func WithUpgrade() Opt {
 	}
 }
 
-func WithCredentialSource(source string) Opt {
+func WithBackendSource(source string) Opt {
 	return func(cmd *DaemonCommand) {
-		cmd.CredentialSource = source
+		cmd.BackendSource = source
 	}
 }
